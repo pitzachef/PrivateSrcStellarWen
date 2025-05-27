@@ -481,7 +481,7 @@
 
     <nav class="glass-effect">
         <div class="logo">
-            <img src="https://tr.rbxcdn.com/180DAY-bcb821b68e5889812ecce77154effbad/150/150/Decal/Png/noFilter" alt="Stellar Logo" style="width: 32px; height: 32px;">
+            <img src="stellar.svg" alt="Stellar Logo" style="width: 32px; height: 32px;">
             Stellar
         </div>
         <div class="nav-links">
@@ -494,8 +494,8 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 class="hero-title">The Most Advanced Roblox Exploit</h1>
-                <p class="hero-description">Experience unparalleled power and security with Stellar. Execute any script, customize your gameplay, and take control of your Roblox experience with our cutting-edge technology.</p>
+                <h1 class="hero-title">Run It Your Way</h1>
+                <p class="hero-description">Stellar lets you play Roblox exactly how you want. Run your favorite scripts, customize your games, and make every session truly yours with our reliable, easy-to-use tools.</p>
                 <div class="button-container">
                     <a href="#" class="button primary-button" id="downloadBtn">
                         <i class="ri-download-2-line"></i>
@@ -536,10 +536,11 @@
 
     <footer>
         <div class="social-links">
-            <a href="https://discord.gg/9G8V2WrtvE" target="_blank"><i class="ri-discord-fill"></i></a>
-            <a href="https://discord.com/users/1361969788938879039?From=Stellar"><i class="ri-hammer-fill"></i></a>
+            <a href="https://discord.gg/9G8V2WrtvE" target="_blank"><i class="ri-discord-fill" alt="Discord Server"></i></a>
+            <a href="https://discord.com/users/1361969788938879039?From=Stellar"><i class="ri-code-line" alt="Developer Profile"></i></a>
+            <a href="#" id="licenseBtn"><i class="ri-file-text-line" title="License Information"></i></a>
         </div>
-        <p>&copy; 2023 Stellar. All rights reserved.</p>
+        <p>&copy; <script>document.write(new Date().getFullYear())</script> Stellar. All rights reserved.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -704,6 +705,106 @@
             const ipHash = await getHashedIP()
             const waffleHash = generateRandomString(10)
             window.location.href = `?hash=${ipHash}&waffle=${waffleHash}`
+        })
+
+        document.getElementById('licenseBtn').addEventListener('click', function(e) {
+            e.preventDefault()
+            const licenseText = `STELLAR SOFTWARE LICENSE AGREEMENT
+Effective Date: July 1, 2025
+Licensor: Binninwl
+Product: Stellar
+
+This Software License Agreement ("Agreement") is a legal agreement between you ("Licensee") and Binninwl ("Licensor") for the use of the software known as "Stellar." By downloading, installing, or using Stellar, you agree to be bound by the terms of this Agreement. If you do not agree, do not install, copy, or use Stellar.
+
+1. GRANT OF LICENSE
+Licensor grants Licensee a non-exclusive, non-transferable, revocable license to use Stellar solely for personal, non-commercial purposes in accordance with this Agreement.
+
+2. OWNERSHIP
+All rights, title, and interest in and to Stellar—including but not limited to its source code, object code, design, interface, documentation, and trademarks—remain the sole property of Licensor. No ownership or intellectual property rights are transferred under this Agreement.
+
+3. RESTRICTIONS
+Licensee shall not:
+  - Copy, reproduce, or distribute Stellar in any form, except as expressly permitted by Licensor.
+  - Modify, adapt, translate, decompile, reverse engineer, disassemble, or create derivative works based on Stellar or any part thereof.
+  - Use Stellar for any commercial purpose, or in any way that violates applicable laws or regulations.
+  - Distribute modified or fake copies of Stellar.
+  - Claim Stellar as your own, or misrepresent your affiliation with it.
+  - Sell or profit from the distribution of Stellar.
+
+4. PROHIBITED ACTIVITIES
+Licensee shall not:
+  - Associate Stellar with any malicious or harmful activity, including malware or exploits.
+  - Use Stellar's name, brand, or assets in any way that misleads others or breaches platform or legal policies.
+  - Create software under the Stellar name or branding that is misleading, harmful, or illegal.
+
+5. TERMINATION
+Licensor reserves the right to terminate or restrict Licensee's access to Stellar at any time for any violation of this Agreement or to protect the integrity of Stellar and its users.
+
+6. DISCLAIMER OF WARRANTIES
+Stellar is provided "as is" without warranty of any kind. Licensor disclaims all warranties, express or implied, including but not limited to warranties of merchantability and fitness for a particular purpose. Licensee uses Stellar at their own risk.
+
+7. LIMITATION OF LIABILITY
+Licensor shall not be liable for any damages, losses, or consequences arising out of the use or inability to use Stellar, including but not limited to incidental, special, or consequential damages.
+
+8. CHANGES TO AGREEMENT
+Licensor may update this Agreement at any time without prior notice. Continued use of Stellar constitutes acceptance of any modified terms.
+
+9. CONTACT
+For questions or to report violations of this Agreement, contact: moonzybinninwl on Discord.`
+
+            const modal = document.createElement('div')
+            modal.className = 'glass-effect'
+            modal.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 2rem;
+                border-radius: 1rem;
+                z-index: 1000;
+                width: 80%;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow-y: auto;
+                background: rgba(15, 15, 20, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            `
+
+            const closeButton = document.createElement('div')
+            closeButton.style.cssText = `
+                position: sticky;
+                top: 0;
+                right: 0;
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.1);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 18px;
+                margin-left: auto;
+            `
+            closeButton.innerHTML = '×'
+            closeButton.onclick = () => modal.remove()
+
+            const content = document.createElement('pre')
+            content.style.cssText = `
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.9rem;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-family: monospace;
+                margin: 1rem 0 0;
+            `
+            content.textContent = licenseText
+
+            modal.appendChild(closeButton)
+            modal.appendChild(content)
+            document.body.appendChild(modal)
         })
 
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
