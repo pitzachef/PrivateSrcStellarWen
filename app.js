@@ -131,8 +131,7 @@ window.onload = async function() {
     await generateNewCredentials()
 
     if (hashParam === currentHashedIP && waffleParam === currentWaffle) {
-        // Credentials match, proceed with download
-        window.location.href = 'https://raw.githubusercontent.com/pitzachef/Stellar/refs/heads/main/url'
+        window.location.href = window.location.origin + '/?hash&waffle=' + generateRandomString(32)
     }
 }
 
@@ -143,7 +142,7 @@ document.getElementById('downloadBtn').addEventListener('click', async function(
         await generateNewCredentials()
     }
 
-    window.location.href = `/?hash=${currentHashedIP}&waffle=${currentWaffle}`
+    window.location.href = window.location.pathname + '?hash&waffle=' + generateRandomString(32)
 })
 
 document.getElementById('licenseBtn').addEventListener('click', function(e) {
