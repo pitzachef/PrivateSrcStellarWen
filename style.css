@@ -397,7 +397,7 @@ nav {
     margin-bottom: 20px;
 }
 
-.social-links a {
+.social-links a { /* took 2 hours to configure this /: */
     color: var(--text-secondary);
     font-size: 24px;
     transition: all 0.3s ease;
@@ -433,3 +433,15 @@ footer p {
     font-size: 14px;
     margin: 0;
 }
+/*
+TODO LIST
+/ Finish License shit (1)
+/ add my profile so i get fame :DDDD (2)
+/ add grid ause it looks cool adn not stoolen from xeno.now (3)
+/ ai generated text on features and title cause idk what to write (4)
+/ use claude 3.5 ai to make some of the js parts cause i do not know how to grab ip and hash with a token (5)
+/ removed pricing cause no one cares about dat (6)
+/ free robux
+Finished 1 2 3 4 5 6
+Still being maintaned (7)
+*/
