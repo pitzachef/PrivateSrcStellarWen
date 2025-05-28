@@ -1,3 +1,6 @@
+let currentHashedIP = null;
+let currentWaffle = null;
+
 const animateOnScroll = (entries, observer) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -34,8 +37,10 @@ async function getHashedIP() {
 function generateRandomString(length) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     let result = ''
+    const array = new Uint8Array(length)
+    crypto.getRandomValues(array)
     for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length))
+        result += chars[array[i] % chars.length]
     }
     return result
 }
@@ -113,51 +118,32 @@ async function checkStatus() {
     }
 }
 
-async function getDownloadUrl() {
-    try {
-        const response = await fetch('https://raw.githubusercontent.com/pitzachef/Stellar/refs/heads/main/url')
-        const url = await response.text()
-        return url.trim()
-    } catch (error) {
-        console.error('Error getting download URL:', error)
-        return null
-    }
+async function generateNewCredentials() {
+    currentHashedIP = await getHashedIP()
+    currentWaffle = generateRandomString(10)
 }
 
 window.onload = async function() {
     const urlParams = new URLSearchParams(window.location.search)
-    const hash = urlParams.get('hash')
-    const waffle = urlParams.get('waffle')
+    const hashParam = urlParams.get('hash')
+    const waffleParam = urlParams.get('waffle')
 
-    if (hash && waffle) {
-        const status = await checkStatus()
-        const downloadUrl = await getDownloadUrl()
+    await generateNewCredentials()
 
-        if (status === 'down') {
-            showStatusModal('Stellar Status', 'Stellar is currently down. Please try again later.', true)
-            return
-        }
-
-        if (status === 'fixing' || status === 'beta') {
-            showStatusModal('Stellar Status', 'Stellar is currently under maintenance. Please check back soon!', true)
-            return
-        }
-
-        if (status === 'up' && downloadUrl) {
-            const { modal } = showStatusModal('Preparing Download', 'Establishing secure connection...')
-            setTimeout(() => {
-                modal.remove()
-                window.location.href = downloadUrl
-            }, 2000)
-        }
+    if (hashParam === currentHashedIP && waffleParam === currentWaffle) {
+        // Credentials match, proceed with download
+        window.location.href = 'https://raw.githubusercontent.com/pitzachef/Stellar/refs/heads/main/url'
     }
 }
 
 document.getElementById('downloadBtn').addEventListener('click', async function(e) {
     e.preventDefault()
-    const ipHash = await getHashedIP()
-    const waffleHash = generateRandomString(10)
-    window.location.href = `?hash=${ipHash}&waffle=${waffleHash}`
+    
+    if (!currentHashedIP || !currentWaffle) {
+        await generateNewCredentials()
+    }
+
+    window.location.href = `/?hash=${currentHashedIP}&waffle=${currentWaffle}`
 })
 
 document.getElementById('licenseBtn').addEventListener('click', function(e) {
