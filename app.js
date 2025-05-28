@@ -1,5 +1,6 @@
 let currentHashedIP = null;
 let currentWaffle = null;
+let downloadCooldown = false;
 
 const animateOnScroll = (entries, observer) => {
     entries.forEach(entry => {
@@ -28,8 +29,7 @@ async function getHashedIP() {
         const hash_buffer = await crypto.subtle.digest('SHA-512', data_buffer)
         const hash_array = Array.from(new Uint8Array(hash_buffer))
         return hash_array.map(b => b.toString(16).padStart(2, '0')).join('')
-    } catch (error) {
-        console.error('Error getting IP:', error)
+    } catch {
         return null
     }
 }
@@ -45,7 +45,7 @@ function generateRandomString(length) {
     return result
 }
 
-function showStatusModal(title, message, isError = false) {
+function showModal(title, message) {
     const modal = document.createElement('div')
     modal.className = 'glass-effect'
     modal.style.cssText = `
@@ -103,8 +103,42 @@ function showStatusModal(title, message, isError = false) {
     modal.appendChild(titleEl)
     modal.appendChild(status)
     document.body.appendChild(modal)
+}
 
-    return { status, modal }
+function showProgressBar() {
+    const progress = document.createElement('div')
+    progress.className = 'glass-effect'
+    progress.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 300px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `
+
+    const bar = document.createElement('div')
+    bar.style.cssText = `
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(to right, #00f260, #0575e6);
+        transition: width 2s ease;
+    `
+
+    progress.appendChild(bar)
+    document.body.appendChild(progress)
+
+    requestAnimationFrame(() => {
+        bar.style.width = '100%'
+    })
+
+    setTimeout(() => {
+        progress.remove()
+    }, 2100)
 }
 
 async function checkStatus() {
@@ -112,8 +146,7 @@ async function checkStatus() {
         const statusResponse = await fetch('https://raw.githubusercontent.com/pitzachef/Stellar/refs/heads/main/status')
         const status = await statusResponse.text()
         return status.trim()
-    } catch (error) {
-        console.error('Error checking status:', error)
+    } catch {
         return 'down'
     }
 }
@@ -123,131 +156,30 @@ async function generateNewCredentials() {
     currentWaffle = generateRandomString(10)
 }
 
-window.onload = async function() {
-    const urlParams = new URLSearchParams(window.location.search)
-    const hashParam = urlParams.get('hash')
-    const waffleParam = urlParams.get('waffle')
+async function startDownload() {
+    if (downloadCooldown) return
+    downloadCooldown = true
 
-    await generateNewCredentials()
-
-    if (hashParam === currentHashedIP && waffleParam === currentWaffle) {
-        window.location.href = window.location.origin + '/?hash&waffle=' + generateRandomString(32)
+    const status = await checkStatus()
+    if (status === 'down') {
+        showModal('Stellar is down', 'The Stellar service is currently unavailable. Try again later.')
+        downloadCooldown = false
+        return
     }
+
+    showProgressBar()
+    setTimeout(() => {
+        const query = '?hash=' + currentHashedIP + '&waffle=' + currentWaffle
+        window.location.href = window.location.origin + '/' + query
+        downloadCooldown = false
+    }, 2000)
 }
 
-document.getElementById('downloadBtn').addEventListener('click', async function(e) {
-    e.preventDefault()
-    
-    if (!currentHashedIP || !currentWaffle) {
-        await generateNewCredentials()
-    }
-
-    window.location.href = window.location.pathname + '?hash&waffle=' + generateRandomString(32)
-})
-
-document.getElementById('licenseBtn').addEventListener('click', function(e) {
-    e.preventDefault()
-    const licenseText = `STELLAR SOFTWARE LICENSE AGREEMENT
-Effective Date: July 1, 2025
-Licensor: Binninwl
-Product: Stellar
-
-This Software License Agreement ("Agreement") is a legal agreement between you ("Licensee") and Binninwl ("Licensor") for the use of the software known as "Stellar." By downloading, installing, or using Stellar, you agree to be bound by the terms of this Agreement. If you do not agree, do not install, copy, or use Stellar.
-
-1. GRANT OF LICENSE
-Licensor grants Licensee a non-exclusive, non-transferable, revocable license to use Stellar solely for personal, non-commercial purposes in accordance with this Agreement.
-
-2. OWNERSHIP
-All rights, title, and interest in and to Stellar—including but not limited to its source code, object code, design, interface, documentation, and trademarks—remain the sole property of Licensor. No ownership or intellectual property rights are transferred under this Agreement.
-
-3. RESTRICTIONS
-Licensee shall not:
-- Copy, reproduce, or distribute Stellar in any form, except as expressly permitted by Licensor.
-- Modify, adapt, translate, decompile, reverse engineer, disassemble, or create derivative works based on Stellar or any part thereof.
-- Use Stellar for any commercial purpose, or in any way that violates applicable laws or regulations.
-- Distribute modified or fake copies of Stellar.
-- Claim Stellar as your own, or misrepresent your affiliation with it.
-- Sell or profit from the distribution of Stellar.
-
-4. PROHIBITED ACTIVITIES
-Licensee shall not:
-- Associate Stellar with any malicious or harmful activity, including malware or exploits.
-- Use Stellar's name, brand, or assets in any way that misleads others or breaches platform or legal policies.
-- Create software under the Stellar name or branding that is misleading, harmful, or illegal.
-
-5. TERMINATION
-Licensor reserves the right to terminate or restrict Licensee's access to Stellar at any time for any violation of this Agreement or to protect the integrity of Stellar and its users.
-
-6. DISCLAIMER OF WARRANTIES
-Stellar is provided "as is" without warranty of any kind. Licensor disclaims all warranties, express or implied, including but not limited to warranties of merchantability and fitness for a particular purpose. Licensee uses Stellar at their own risk.
-
-7. LIMITATION OF LIABILITY
-Licensor shall not be liable for any damages, losses, or consequences arising out of the use or inability to use Stellar, including but not limited to incidental, special, or consequential damages.
-
-8. CHANGES TO AGREEMENT
-Licensor may update this Agreement at any time without prior notice. Continued use of Stellar constitutes acceptance of any modified terms.
-
-9. CONTACT
-For questions or to report violations of this Agreement, contact: moonzybinninwl on Discord.`
-
-    const modal = document.createElement('div')
-    modal.className = 'glass-effect'
-    modal.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 2rem;
-        border-radius: 1rem;
-        z-index: 1000;
-        width: 80%;
-        max-width: 800px;
-        max-height: 80vh;
-        overflow-y: auto;
-        background: rgba(15, 15, 20, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    `
-
-    const closeButton = document.createElement('div')
-    closeButton.style.cssText = `
-        position: sticky;
-        top: 0;
-        right: 0;
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 18px;
-        margin-left: auto;
-    `
-    closeButton.innerHTML = '×'
-    closeButton.onclick = () => modal.remove()
-
-    const content = document.createElement('pre')
-    content.style.cssText = `
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.9rem;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        font-family: monospace;
-        margin: 1rem 0 0;
-    `
-    content.textContent = licenseText
-
-    modal.appendChild(closeButton)
-    modal.appendChild(content)
-    document.body.appendChild(modal)
-})
+document.getElementById('downloadBtn').addEventListener('click', startDownload)
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        if (this.id !== 'downloadBtn') {
+        if (!this.href.endsWith('#')) {
             e.preventDefault()
             document.querySelector(this.getAttribute('href')).scrollIntoView({
                 behavior: 'smooth'
@@ -259,6 +191,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 document.addEventListener('mousemove', (e) => {
     const moveX = (e.clientX - window.innerWidth / 2) * 0.01
     const moveY = (e.clientY - window.innerHeight / 2) * 0.01
-    
-    document.querySelector('.hero-image').style.transform = `translate(${moveX}px, ${moveY}px)`
+    const heroImage = document.querySelector('.hero-image')
+    if (heroImage) heroImage.style.transform = `translate(${moveX}px, ${moveY}px)`
 })
